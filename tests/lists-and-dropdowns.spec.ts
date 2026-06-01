@@ -29,8 +29,7 @@ test("Validate the pet type update", async ({ page }) => {
   await page.getByText("Eduardo Rodriquez").click();
 
   const rosyPetSection = page.locator("app-pet-list", { hasText: "Rosy" });
-  const rosyEditPetButton = rosyPetSection.getByRole("button", {name: "Edit Pet"});
-  await rosyEditPetButton.click();
+  await rosyPetSection.getByRole("button", {name: "Edit Pet"}).click();
 
   const petTypeDisplayField = page.locator(".form-group", { hasText: "Type" }).getByRole("textbox");
   const petTypeDropDown = page.locator("#type");
@@ -40,8 +39,8 @@ test("Validate the pet type update", async ({ page }) => {
   await expect(petTypeDropDown).toHaveValue("bird");
   await page.getByRole("button", { name: "Update Pet" }).click();
 
-  await expect(rosyPetSection).toContainText("Typebird");
-  await rosyEditPetButton.click();
+  await expect(rosyPetSection.locator('dt:text-is("Type") + dd')).toHaveText("bird");
+  await rosyPetSection.getByRole("button", {name: "Edit Pet"}).click();
 
   await expect(petTypeDisplayField).toHaveValue("bird");
   await petTypeDropDown.selectOption("dog");
