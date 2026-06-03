@@ -20,32 +20,29 @@ test.describe("Owners Page Test Cases", () => {
 
   test("Validate owners count of the Madison city", async ({ page }) => {
 
-    await page.waitForTimeout(1000)
-    expect(await page.getByRole("row", { name: "Madison" }).count()).toEqual(4)
+    await expect(page.getByRole("row", { name: "Madison" })).toHaveCount(4)
 
   });
 
   test('Validate search by Last Name', async ({ page }) => {
 
-    const lastNameInput = page.locator('#lastName')
-    const findOwnerButton = page.getByRole('button', { name: "Find Owner" })
-
     const searchValues = ["Black", "Davis", "Es", "Playwright"]
 
     for (let searchValue of searchValues) {
-      await lastNameInput.fill(searchValue)
-      await findOwnerButton.click()
-      await page.waitForTimeout(1000)
+      await page.locator('#lastName').fill(searchValue)
+      await page.getByRole('button', { name: "Find Owner" }).click()
+      await page.waitForResponse('**/api/owners*')
       if (searchValue === "Playwright") {
         await expect(page.getByText(`No owners with LastName starting with "${searchValue}"`)).toBeVisible()
       }
       else {
-        for (let fullName of await page.locator('.ownerFullName').allTextContents()) {
+        for (const ownerCell of await page.locator('.ownerFullName').all()) {
+          const lastName = (await ownerCell.textContent())!.split(' ').pop()
           if (searchValue === "Es") {
-            expect(fullName.split(" ").pop()).toContain(searchValue)
+            expect(lastName).toContain(searchValue)
           }
           else {
-            expect(fullName.split(" ").pop()).toEqual(searchValue)
+            expect(lastName).toEqual(searchValue)
           }
         }
 
@@ -58,27 +55,25 @@ test.describe("Owners Page Test Cases", () => {
 
     const phoneNumber = "6085552765"
     const ownerRow = page.getByRole('row', { name: phoneNumber })
-    const ownerFullName = await ownerRow.locator('.ownerFullName').textContent() || ""
-    const petName = await ownerRow.locator('td').locator('tr').textContent() || ""
-    await page.getByRole('link', { name: ownerFullName }).click()
+    const ownerFullName = await ownerRow.locator('.ownerFullName').textContent() 
+    const petName = await ownerRow.locator('td').last().textContent() 
+    await page.getByRole('link', { name: ownerFullName! }).click()
 
     await expect(page.locator('tr', { hasText: "Telephone" }).locator('td')).toHaveText(phoneNumber)
-    await expect(page.locator('app-pet-list').locator('dt:text-is("Name") + dd')).toHaveText(petName)
+    await expect(page.locator('app-pet-list').locator('dt:text-is("Name") + dd')).toHaveText(petName!)
 
   })
 
   test('Validate pets of the Madison city', async ({ page }) => {
     const madisonCityPets = ["Leo", "George", "Mulligan", "Freddy"]
     const madisonCityPetList = []
-    await page.waitForTimeout(1000)
-    const madisonRows = page.locator('tbody tr', { hasText: "Madison" })
+    await page.getByRole('row', { name: 'Madison' }).first().waitFor()
+    const madisonRows = page.getByRole('row', { name: 'Madison' })
     for (let row of await madisonRows.all()) {
-      madisonCityPetList.push((await row.locator('td').last().textContent())?.trim())
+      madisonCityPetList.push((await row.locator('td').last().textContent())!.trim())
     }
 
-    for (let pet of madisonCityPets) {
-      expect(madisonCityPetList).toContain(pet)
-    }
+    expect(madisonCityPetList).toEqual(expect.arrayContaining(madisonCityPets))
 
   })
 
@@ -122,12 +117,12 @@ test('Validate specialty lists', async ({ page }) => {
   await page.getByRole('button', { name: "Add" }).click()
   await page.locator('#name').fill('oncology')
   await page.getByRole('button', { name: "Save" }).click()
-  const specialtyInput = page.getByRole('textbox')
-  await expect(specialtyInput.last()).toHaveValue('oncology')
+  const specialtyInputs = page.getByRole('textbox')
+  await expect(specialtyInputs.last()).toHaveValue('oncology')
 
   const specialtiesList = []
 
-  for (let specialty of await specialtyInput.all()) {
+  for (let specialty of await specialtyInputs.all()) {
     specialtiesList.push(await specialty.inputValue())
   }
 
@@ -136,9 +131,9 @@ test('Validate specialty lists', async ({ page }) => {
 
   await page.getByRole('row', { name: "Sharon Jenkins" }).getByRole('button', { name: "Edit" }).click()
   const specialtyDropDownValues = []
-  const specialtyCheckboxItem = page.locator('.dropdown-content').locator('label')
+  const specialtyCheckboxItems = page.locator('.dropdown-content label')
   await page.locator(".dropdown-display").click()
-  for (let specialty of await specialtyCheckboxItem.all()) {
+  for (let specialty of await specialtyCheckboxItems.all()) {
     specialtyDropDownValues.push(await specialty.textContent())
   }
   expect(specialtiesList).toEqual(specialtyDropDownValues)
