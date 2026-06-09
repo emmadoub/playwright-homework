@@ -10,29 +10,26 @@ test.beforeEach(async ({ page }) => {
 
 test('Select the desired date in the calendar', async ({ page }) => {
 
-    const ownerLink = page.getByRole('link', { name: "Harold Davis" })
-    const href = await ownerLink.getAttribute('href');
-    await ownerLink.click()
-    await page.waitForResponse(`**/api${href}`)
+    await page.getByRole('link', { name: "Harold Davis" }).click()
     await page.getByRole('button', { name: "Add New Pet" }).click()
-    await page.waitForResponse('**/api/pettypes')
-    const newPetName = "Tom"
-    await page.getByRole('textbox', { name: "Name" }).fill(newPetName)
-    await expect(page.locator('.col-sm-10', { has: page.getByRole('textbox', { name: "Name" }) }).locator('.glyphicon-ok')).toBeVisible()
+    await expect(page.locator('.glyphicon-remove').first()).toBeVisible()
+    await page.getByRole('textbox', { name: "Name" }).fill("Tom")
+    await expect(page.locator('.col-sm-10', { has: page.getByRole('textbox', { name: "Name" }) }).locator('.glyphicon-remove')).not.toBeVisible()
+    await expect(page.locator('.glyphicon-ok')).toBeVisible()
 
     await page.getByRole('button', { name: 'Open Calendar' }).click()
     await page.getByRole('button', { name: 'Choose month and year' }).click()
     await page.getByRole('button', { name: 'Previous 24 years' }).click()
     await page.getByRole('button', { name: "2014" }).click()
-    await page.getByRole('button').getByText("MAY").click()
-    await page.getByRole('button').getByText("2", { exact: true }).click()
+    await page.getByText("MAY").click()
+    await page.getByText("2", { exact: true }).click()
     await expect(page.locator('.mat-datepicker-input')).toHaveValue('2014/05/02')
 
     await page.locator("#type").selectOption("dog")
     await page.getByRole('button', { name: "Save Pet" }).click()
 
-    const newPetSection = page.locator("app-pet-list", { hasText: newPetName })
-    await expect(newPetSection.locator('dt:text-is("Name") + dd')).toHaveText(newPetName)
+    const newPetSection = page.locator("app-pet-list", { hasText: "Tom" })
+    await expect(newPetSection.locator('dt:text-is("Name") + dd')).toHaveText("Tom")
     await expect(newPetSection.locator('dt:text-is("Birth Date") + dd')).toHaveText('2014-05-02')
     await expect(newPetSection.locator('dt:text-is("Type") + dd')).toHaveText('dog')
 
@@ -44,10 +41,7 @@ test('Select the desired date in the calendar', async ({ page }) => {
 
 test('Select the dates of visits and validate dates order', async ({ page }) => {
 
-    const ownerLink = page.getByRole('link', { name: "Jean Coleman" })
-    const href = await ownerLink.getAttribute('href');
-    await ownerLink.click()
-    await page.waitForResponse(`**/api${href}`)
+    await page.getByRole('link', { name: "Jean Coleman" }).click()
     const samanthaPetSection = page.locator("app-pet-list", { hasText: "Samantha" })
     await samanthaPetSection.getByRole('button', { name: "Add visit" }).click()
 
@@ -57,35 +51,35 @@ test('Select the dates of visits and validate dates order', async ({ page }) => 
 
 
     let date = new Date()
-    let expectedCalendarDate = date.getDate().toString()
-    let expectedDate = String(date.getDate()).padStart(2, '0')
-    let expectedMonth = String(date.getMonth() + 1).padStart(2, '0')
-    let expectedYear = date.getFullYear().toString()
-    let expectedFullDate = `${expectedYear}/${expectedMonth}/${expectedDate}`
+    let currentDayForCalendarClick = date.getDate().toString()
+    let currentDay = date.toLocaleString('en-US', { day: '2-digit' })
+    let currentMonth = date.toLocaleString('en-US', { month: '2-digit' })
+    let currentYear = date.getFullYear().toString()
+    let expectedFullDate = `${currentYear}/${currentMonth}/${currentDay}`
 
     await page.getByRole('button', { name: 'Open Calendar' }).click()
-    await page.getByRole('button').getByText(expectedCalendarDate, { exact: true }).click()
+    await page.getByText(currentDayForCalendarClick, { exact: true }).click()
     await expect(page.locator('.mat-datepicker-input')).toHaveValue(expectedFullDate)
     await page.locator('#description').fill("dermatologist's visit")
     await page.getByRole('button', { name: "Add Visit" }).click()
 
     const samanthaVisitTable = samanthaPetSection.locator('app-visit-list')
-    await expect(samanthaVisitTable.locator('td').first()).toHaveText(`${expectedYear}-${expectedMonth}-${expectedDate}`)
+    await expect(samanthaVisitTable.locator('td').first()).toHaveText(`${currentYear}-${currentMonth}-${currentDay}`)
     await samanthaPetSection.getByRole('button', { name: "Add visit" }).click()
     date.setDate(date.getDate() - 45)
-    expectedCalendarDate = date.getDate().toString()
-    expectedDate = String(date.getDate()).padStart(2, '0')
-    expectedMonth = String(date.getMonth() + 1).padStart(2, '0')
-    expectedYear = date.getFullYear().toString()
+    currentDayForCalendarClick = date.getDate().toString()
+    currentDay = date.toLocaleString('en-US', { day: '2-digit' })
+    currentMonth = date.toLocaleString('en-US', { month: '2-digit' })
+    currentYear = date.getFullYear().toString()
 
     await page.getByRole('button', { name: 'Open Calendar' }).click()
     let calendarMonthAndYear = await page.getByRole('button', { name: 'Choose month and year' }).textContent()
-    const expectedMonthAndYear = `${expectedMonth} ${expectedYear}`
+    const expectedMonthAndYear = `${currentMonth} ${currentYear}`
     while (!calendarMonthAndYear?.includes(expectedMonthAndYear)) {
         await page.getByRole('button', { name: 'Previous month' }).click()
         calendarMonthAndYear = await page.getByRole('button', { name: 'Choose month and year' }).textContent()
     }
-    await page.getByRole('button').getByText(expectedCalendarDate, { exact: true }).click()
+    await page.getByText(currentDayForCalendarClick, { exact: true }).click()
     await page.locator('#description').fill("massage therapy")
     await page.getByRole('button', { name: "Add Visit" }).click()
 
