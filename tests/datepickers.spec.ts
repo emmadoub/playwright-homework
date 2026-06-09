@@ -12,9 +12,10 @@ test('Select the desired date in the calendar', async ({ page }) => {
 
     await page.getByRole('link', { name: "Harold Davis" }).click()
     await page.getByRole('button', { name: "Add New Pet" }).click()
-    await expect(page.locator('.glyphicon-remove').first()).toBeVisible()
+    await expect(page.locator('.col-sm-10', { has: page.getByRole('textbox', { name: "Name" }) }).locator('.glyphicon-remove')).toBeVisible()
+    await expect(page.getByRole('textbox', { name: "Name" })).toHaveCSS('border-color', 'rgb(204, 204, 204)' )
     await page.getByRole('textbox', { name: "Name" }).fill("Tom")
-    await expect(page.locator('.col-sm-10', { has: page.getByRole('textbox', { name: "Name" }) }).locator('.glyphicon-remove')).not.toBeVisible()
+    await expect(page.getByRole('textbox', { name: "Name" })).toHaveCSS('border-color', 'rgb(43, 84, 44)' )
     await expect(page.locator('.glyphicon-ok')).toBeVisible()
 
     await page.getByRole('button', { name: 'Open Calendar' }).click()
@@ -67,19 +68,18 @@ test('Select the dates of visits and validate dates order', async ({ page }) => 
     await expect(samanthaVisitTable.locator('td').first()).toHaveText(`${currentYear}-${currentMonth}-${currentDay}`)
     await samanthaPetSection.getByRole('button', { name: "Add visit" }).click()
     date.setDate(date.getDate() - 45)
-    currentDayForCalendarClick = date.getDate().toString()
-    currentDay = date.toLocaleString('en-US', { day: '2-digit' })
-    currentMonth = date.toLocaleString('en-US', { month: '2-digit' })
-    currentYear = date.getFullYear().toString()
+    let pastDay = date.getDate().toString()
+    let pastMonth = date.toLocaleString('en-US', { month: '2-digit' })
+    let pastYear = date.getFullYear().toString()
 
     await page.getByRole('button', { name: 'Open Calendar' }).click()
     let calendarMonthAndYear = await page.getByRole('button', { name: 'Choose month and year' }).textContent()
-    const expectedMonthAndYear = `${currentMonth} ${currentYear}`
+    const expectedMonthAndYear = `${pastMonth} ${pastYear}`
     while (!calendarMonthAndYear?.includes(expectedMonthAndYear)) {
         await page.getByRole('button', { name: 'Previous month' }).click()
         calendarMonthAndYear = await page.getByRole('button', { name: 'Choose month and year' }).textContent()
     }
-    await page.getByText(currentDayForCalendarClick, { exact: true }).click()
+    await page.getByText(pastDay, { exact: true }).click()
     await page.locator('#description').fill("massage therapy")
     await page.getByRole('button', { name: "Add Visit" }).click()
 
