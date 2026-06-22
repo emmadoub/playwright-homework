@@ -37,7 +37,7 @@ test('mocking API request', async ({ page }) => {
 
     await expect(page.locator('app-pet-list')).toHaveCount(2)
     await expect(page.locator('app-pet-list').locator('dt:text-is("Name") + dd')).toHaveText(["Yuki", "Miltos"])
-    await expect(page.locator('app-pet-list', { hasText: 'Yuki' }).locator('app-visit-list tr').filter({ has: page.locator('td') })).toHaveCount(10)
+    await expect(page.locator('app-pet-list', { hasText: 'Yuki' }).locator('app-visit-list table > tr')).toHaveCount(10)
 
 })
 
@@ -63,7 +63,7 @@ test('Intercept API response', async ({ page }) => {
     const responsePromise = page.waitForResponse(
         res => res.url().includes('/api/vets')
     );
-    
+
     await page.getByRole("button", { name: "Veterinarians" }).click()
     await page.getByRole("link", { name: "All" }).click()
 
