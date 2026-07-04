@@ -1,0 +1,42 @@
+[
+    {
+        "id": 4928,
+        "name": "dentistry"
+    },
+    {
+        "id": 4927,
+        "name": "surgery"
+    },
+    {
+        "id": 4926,
+        "name": "radiology"
+    },
+    {
+        "id": 4930,
+        "name": "internal medicine"
+    },
+    {
+        "id": 4931,
+        "name": "dermatology"
+    },
+    {
+        "id": 4932,
+        "name": "ophthalmology"
+    },
+    {
+        "id": 4933,
+        "name": "cardiology"
+    },
+    {
+        "id": 4934,
+        "name": "neurology"
+    },
+    {
+        "id": 4935,
+        "name": "oncology"
+    },
+    {
+        "id": 4936,
+        "name": "anesthesiology"
+    }
+]

@@ -1,0 +1,107 @@
+
+    {
+        "firstName": "Nick",
+        "lastName": "Carteris",
+        "address": "105 Acropolis St.",
+        "city": "Athens",
+        "telephone": "6965543321",
+        "id": 2515,
+        "pets": [
+            {
+                "name": "Yuki",
+                "birthDate": "2017-07-24",
+                "type": {
+                    "name": "cat",
+                    "id": 5073
+                },
+                "id": 5636,
+                "ownerId": 2515,
+                "visits": [
+                    {
+                        "date": "2018-03-04",
+                        "description": "neutered",
+                        "id": 6070,
+                        "petId": null
+                    },
+                    {
+                        "date": "2022-09-04",
+                        "description": "rabies shot",
+                        "id": 6071,
+                        "petId": null
+                    },
+                    {
+                        "date": "2022-06-04",
+                        "description": "spayed",
+                        "id": 6076,
+                        "petId": null
+                    },
+                    {
+                        "date": "2023-11-04",
+                        "description": "dentist",
+                        "id": 6077,
+                        "petId": null
+                    },
+                    {
+                        "date": "2024-06-04",
+                        "description": "rabies shot",
+                        "id": 6078,
+                        "petId": null
+                    },
+                    {
+                        "date": "2025-06-04",
+                        "description": "spayed",
+                        "id": 6079,
+                        "petId": null
+                    },
+                    {
+                        "date": "2025-09-04",
+                        "description": "rabies shot",
+                        "id": 6080,
+                        "petId": null
+                    },
+                    {
+                        "date": "2025-12-04",
+                        "description": "spayed",
+                        "id": 6081,
+                        "petId": null
+                    },
+                    {
+                        "date": "2026-04-04",
+                        "description": "rabies shot",
+                        "id": 6082,
+                        "petId": null
+                    },
+                    {
+                        "date": "2026-07-04",
+                        "description": "dentist",
+                        "id": 6084,
+                        "petId": null
+                    }
+                ]
+            },
+            {
+                "name": "Miltos",
+                "birthDate": "20015-09-04",
+                "type": {
+                    "name": "dog",
+                    "id": 4073
+                },
+                "id": 5635,
+                "ownerId": 2515,
+                "visits": [
+                    {
+                        "date": "2010-03-04",
+                        "description": "rabies shot",
+                        "id": 6072,
+                        "petId": null
+                    },
+                    {
+                        "date": "2009-06-04",
+                        "description": "spayed",
+                        "id": 6073,
+                        "petId": null
+                    }
+                ]
+            }
+        ]
+    }

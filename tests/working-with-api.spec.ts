@@ -1,0 +1,76 @@
+import { test, expect } from '@playwright/test';
+import owners from '../test-data/owners.json'
+import owner2515 from '../test-data/owner2515.json'
+import specialties from '../test-data/specialties.json'
+
+
+test.beforeEach(async ({ page }) => {
+    await page.goto('/')
+
+})
+
+
+test('mocking API request', async ({ page }) => {
+
+    await page.route('**/owners', async route => {
+        await route.fulfill({
+            body: JSON.stringify(owners)
+        })
+    })
+
+    await page.route('**/owners/2515', async route => {
+        await route.fulfill({
+            body: JSON.stringify(owner2515)
+        })
+    })
+
+    await page.getByRole("button", { name: "Owners" }).click()
+    await page.getByRole("link", { name: "Search" }).click();
+
+    await expect(page.locator('.ownerFullName')).toHaveCount(2)
+    await page.getByRole('link', { name: 'Nick Carteris' }).click()
+    await expect(page.locator('.ownerFullName')).toHaveText("Nick Carteris")
+
+    await expect(page.getByRole('row', { name: 'Address' })).toContainText('105 Acropolis St.')
+    await expect(page.getByRole('row', { name: "City" })).toContainText("Athens")
+    await expect(page.getByRole('row', { name: "Telephone" })).toContainText("6965543321")
+
+    await expect(page.locator('app-pet-list')).toHaveCount(2)
+    await expect(page.locator('app-pet-list').locator('dt:text-is("Name") + dd')).toHaveText(["Yuki", "Miltos"])
+    await expect(page.locator('app-pet-list', { hasText: 'Yuki' }).locator('app-visit-list table > tr')).toHaveCount(10)
+
+})
+
+test('Intercept API response', async ({ page }) => {
+
+    await page.route('**/api/vets', async route => {
+
+        const response = await route.fetch()
+        const responseBody = await response.json()
+
+        const sharonJenkinsObject = responseBody.find(
+            (vet: { firstName: string; lastName: string; specialties: []; id: number }) =>
+                vet.firstName === 'Sharon' && vet.lastName === 'Jenkins'
+        )
+
+        sharonJenkinsObject.specialties = specialties
+
+        await route.fulfill({
+            body: JSON.stringify(responseBody)
+        })
+    })
+
+    const responsePromise = page.waitForResponse(
+        res => res.url().includes('/api/vets')
+    );
+
+    await page.getByRole("button", { name: "Veterinarians" }).click()
+    await page.getByRole("link", { name: "All" }).click()
+
+    await responsePromise;
+
+    for (let specialty of specialties) {
+        await expect(page.getByRole("row", { name: "Sharon Jenkins" }).locator('td').nth(1)).toContainText(specialty.name)
+    }
+})
+
