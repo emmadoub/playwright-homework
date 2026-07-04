@@ -3,14 +3,14 @@ import { chromium, type FullConfig } from '@playwright/test';
 const fs = require('fs').promises;
 const filePath = '.auth/user.json';
 
-async function browserAuthorize(config: FullConfig){
+async function browserAuthorize(config: FullConfig) {
     const { baseURL, storageState } = config.projects[0].use;
-   
+
     let user: any;
     try {
         const data = await fs.readFile(filePath);
         user = JSON.parse(data);
-    } catch (err) {
+    } catch (err: any) {
         if (err.code === 'ENOENT') {
             console.log('User auth file does not exist, creating new file');
             user = { cookies: [], origins: [] };
@@ -29,9 +29,9 @@ async function browserAuthorize(config: FullConfig){
     console.log(`\x1b[2m\tSign in started to '${baseURL}'\x1b[0m`);
 
     await page.goto(baseURL!)
-    if(await page.locator('.login').isVisible()){
-        await page.locator('#username').fill(process.env.EMAIL)
-        await page.locator('#password').fill(process.env.PASSWORD)
+    if (await page.locator('.login').isVisible()) {
+        await page.locator('#username').fill(process.env.EMAIL!)
+        await page.locator('#password').fill(process.env.PASSWORD!)
         await page.getByRole('button', { name: 'Continue' }).click()
     }
     const tokenResponse = await page.waitForResponse("**/token")
